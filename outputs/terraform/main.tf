@@ -1,0 +1,18 @@
+terraform {
+  required_version = ">= 1.5.0"
+}
+
+
+# Container infrastructure placeholder
+resource "null_resource" "container" {
+  provisioner "local-exec" {
+    command = "echo Container infrastructure selected"
+  }
+}
+
+# Networking infrastructure placeholder
+resource "null_resource" "networking" {
+  provisioner "local-exec" {
+    command = "echo Networking infrastructure selected"
+  }
+}
