@@ -2,6 +2,7 @@ def build_requirements(app_profile):
     requirements = {
         "needs_container": False,
         "needs_database": False,
+        "needs_kubernetes": True,
         "needs_public_access": True,
         "needs_environment_variables": False,
         "recommended_runtime": None,

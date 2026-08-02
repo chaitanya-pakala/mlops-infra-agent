@@ -1,66 +1,60 @@
 from pathlib import Path
+import shutil
 
 
-def generate_terraform(infrastructure_pattern, output_dir="outputs/terraform"):
+def generate_terraform(
+    infrastructure_pattern,
+    environment="dev",
+    output_dir="outputs/terraform"
+):
+    pattern_name = infrastructure_pattern.get("pattern_name")
+
+    if not pattern_name:
+        raise ValueError("No infrastructure pattern was selected.")
+
+    allowed_environments = [
+        "dev",
+        "staging",
+        "prod"
+    ]
+
+    if environment not in allowed_environments:
+        raise ValueError(
+            f"Invalid environment: {environment}. "
+            f"Choose from {allowed_environments}"
+        )
+
+    pattern_path = Path("patterns") / pattern_name
+
+    environment_file = (
+        Path("environments") / f"{environment}.tfvars"
+    )
+
     output_path = Path(output_dir)
-    output_path.mkdir(parents=True, exist_ok=True)
 
-    components = infrastructure_pattern.get("components", [])
+    if not pattern_path.exists():
+        raise FileNotFoundError(
+            f"Terraform pattern not found: {pattern_path}"
+        )
 
-    main_tf = """terraform {
-  required_version = ">= 1.5.0"
-}
+    if not environment_file.exists():
+        raise FileNotFoundError(
+            f"Environment file not found: {environment_file}"
+        )
 
-"""
+    if output_path.exists():
+        shutil.rmtree(output_path)
 
-    if "container" in components:
-        main_tf += """
-# Container infrastructure placeholder
-resource "null_resource" "container" {
-  provisioner "local-exec" {
-    command = "echo Container infrastructure selected"
-  }
-}
-"""
+    # Copy the approved Terraform pattern
+    shutil.copytree(
+        pattern_path,
+        output_path
+    )
 
-    if "database" in components:
-        main_tf += """
-# Database infrastructure placeholder
-resource "null_resource" "database" {
-  provisioner "local-exec" {
-    command = "echo Database infrastructure selected"
-  }
-}
-"""
-
-    if "networking" in components:
-        main_tf += """
-# Networking infrastructure placeholder
-resource "null_resource" "networking" {
-  provisioner "local-exec" {
-    command = "echo Networking infrastructure selected"
-  }
-}
-"""
-
-    variables_tf = """variable "environment" {
-  description = "Deployment environment"
-  type        = string
-  default     = "local"
-}
-"""
-
-    outputs_tf = """output "selected_pattern" {
-  value = "Infrastructure generated successfully"
-}
-"""
-
-    tfvars = """environment = "local"
-"""
-
-    (output_path / "main.tf").write_text(main_tf)
-    (output_path / "variables.tf").write_text(variables_tf)
-    (output_path / "outputs.tf").write_text(outputs_tf)
-    (output_path / "terraform.tfvars").write_text(tfvars)
+    # Copy environment-specific values
+    shutil.copy(
+        environment_file,
+        output_path / "terraform.tfvars"
+    )
 
     return str(output_path)
