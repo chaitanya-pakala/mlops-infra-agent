@@ -46,8 +46,6 @@ deployment_requirements = build_requirements(app_profile)
 print("APP PROFILE")
 print(app_profile)
 
-deployment_requirements = build_requirements(app_profile)
-print("KUBERNETES DEBUG:", deployment_requirements.get("needs_kubernetes"))
 
 print("\nDEPLOYMENT REQUIREMENTS")
 print(deployment_requirements)
@@ -89,11 +87,6 @@ if validation_result.get("success"):
         print("\nLOCAL DOCKER DEPLOYMENT")
         print(local_deployment)
 
-if validation_result.get("success"):
-    local_deployment = deploy_local_docker()
-
-    print("\nLOCAL DOCKER DEPLOYMENT")
-    print(local_deployment)
     
 git_status = check_git_repository()
 current_branch = get_current_branch()
